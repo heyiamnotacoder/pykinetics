@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pykinetics | Advanced PK Analysis</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@400;500;600;700&display=swap"
+        rel="stylesheet">
+    <link rel="icon" type="image/png" href="{{ url_for('static', filename='images/logo_clean.png') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+
+<body>
+    <div class="app-container">
+        <!-- Header -->
+        <header class="header">
+            <div class="logo">
+                <img class="logo-img" src="{{ url_for('static', filename='images/logo_clean.png') }}"
+                    alt="Pykinetics Logo">
+            </div>
+            <p class="subtitle">Pharmacokinetic Analysis & Modeling</p>
+        </header>
+
+        <main class="main-content">
+            <!-- Left Panel: Inputs -->
+            <section class="panel input-panel">
+                <div class="panel-header">
+                    <h2>Data Input</h2>
+                </div>
+
+                <div class="form-group route-group">
+                    <label>Administration Route</label>
+                    <div class="radio-wrapper">
+                        <label>
+                            <input type="radio" name="admin_route" value="IV Bolus" checked> IV Bolus
+                        </label>
+                        <label>
+                            <input type="radio" name="admin_route" value="Oral"> Oral
+                        </label>
+                    </div>
+                </div>
+
+                <div class="form-group route-group">
+                    <label>Compartments List</label>
+                    <div class="radio-wrapper">
+                        <label><input type="radio" name="comp_count" value="1" onchange="updateCompColumns()" checked>
+                            1</label>
+                        <label><input type="radio" name="comp_count" value="2" onchange="updateCompColumns()"> 2</label>
+                        <label><input type="radio" name="comp_count" value="3" onchange="updateCompColumns()"> 3</label>
+                        <label><input type="radio" name="comp_count" value="4" onchange="updateCompColumns()"> 4</label>
+                    </div>
+                </div>
+
+                <div class="form-group dose-group">
+                    <label for="dose">Drug Dose</label>
+                    <div class="input-wrapper">
+                        <input type="number" id="dose" placeholder="e.g., 500" step="any" required>
+                        <span class="unit">mg</span>
+                    </div>
+                </div>
+
+                <div class="data-table-container">
+                    <div class="table-header-row" id="table-header-row">
+                        <span>Time (h)</span>
+                        <div class="conc-headers-wrapper">
+                            <span class="conc-header">C1 (mg/L)</span>
+                        </div>
+                        <span>Action</span>
+                    </div>
+                    <div id="data-rows">
+                        <!-- Initial rows -->
+                        <div class="data-row">
+                            <input type="number" class="time-input" placeholder="0" step="any">
+                            <div class="conc-inputs-wrapper">
+                                <input type="number" class="conc-input conc-input-1" placeholder="50" step="any">
+                            </div>
+                            <button class="icon-btn remove-btn" onclick="removeRow(this)"
+                                title="Remove point">×</button>
+                        </div>
+                        <div class="data-row">
+                            <input type="number" class="time-input" placeholder="1" step="any">
+                            <div class="conc-inputs-wrapper">
+                                <input type="number" class="conc-input conc-input-1" placeholder="40" step="any">
+                            </div>
+                            <button class="icon-btn remove-btn" onclick="removeRow(this)"
+                                title="Remove point">×</button>
+                        </div>
+                        <div class="data-row">
+                            <input type="number" class="time-input" placeholder="2" step="any">
+                            <div class="conc-inputs-wrapper">
+                                <input type="number" class="conc-input conc-input-1" placeholder="32" step="any">
+                            </div>
+                            <button class="icon-btn remove-btn" onclick="removeRow(this)"
+                                title="Remove point">×</button>
+                        </div>
+                        <div class="data-row">
+                            <input type="number" class="time-input" placeholder="4" step="any">
+                            <div class="conc-inputs-wrapper">
+                                <input type="number" class="conc-input conc-input-1" placeholder="20" step="any">
+                            </div>
+                            <button class="icon-btn remove-btn" onclick="removeRow(this)"
+                                title="Remove point">×</button>
+                        </div>
+                    </div>
+                    <button class="btn btn-secondary add-row-btn" onclick="addRow()">
+                        <span>+ Add Data Point</span>
+                    </button>
+                </div>
+
+                <button class="btn btn-primary calculate-btn" onclick="calculatePK()">
+                    <span id="btn-text">Analyze Kinetics</span>
+                    <div id="btn-loader" class="loader hidden"></div>
+                </button>
+
+                <div id="error-message" class="error-msg hidden"></div>
+            </section>
+
+            <!-- Right Panel: Results -->
+            <section class="panel results-panel hidden" id="results-panel">
+                <div class="panel-header">
+                    <h2>Analysis Results</h2>
+                    <span class="badge" id="order-badge">First Order</span>
+                </div>
+
+                <div class="pk-grid">
+                    <div class="pk-card">
+                        <span class="pk-label">Elimination Rate (Ke)</span>
+                        <div class="pk-value"><span id="val-ke">--</span> <span class="unit">h⁻¹</span></div>
+                    </div>
+                    <div class="pk-card">
+                        <span class="pk-label">Half-Life (t½)</span>
+                        <div class="pk-value"><span id="val-hl">--</span> <span class="unit">h</span></div>
+                    </div>
+                    <div class="pk-card">
+                        <span class="pk-label">Volume of Dist. (Vd)</span>
+                        <div class="pk-value"><span id="val-vd">--</span> <span class="unit">L</span></div>
+                    </div>
+                    <div class="pk-card">
+                        <span class="pk-label">Clearance (Cl)</span>
+                        <div class="pk-value"><span id="val-cl">--</span> <span class="unit">L/h</span></div>
+                    </div>
+                    <div class="pk-card">
+                        <span class="pk-label">Initial Conc. (C₀)</span>
+                        <div class="pk-value"><span id="val-c0">--</span> <span class="unit">mg/L</span></div>
+                    </div>
+                    <div class="pk-card highlight-card">
+                        <span class="pk-label">Total AUC</span>
+                        <div class="pk-value"><span id="val-auc">--</span> <span class="unit">mg·h/L</span></div>
+                    </div>
+                </div>
+
+                <div class="charts-container">
+                    <div class="chart-wrapper">
+                        <h3>Linear Scale (C vs t)</h3>
+                        <canvas id="linearChart"></canvas>
+                    </div>
+                    <div class="chart-wrapper">
+                        <h3>Logarithmic Scale (ln C vs t)</h3>
+                        <canvas id="logChart"></canvas>
+                    </div>
+
+                    <div class="chart-wrapper">
+                        <h3>Second Order (1/C vs t)</h3>
+                        <canvas id="invChart"></canvas>
+                    </div>
+                    <div class="chart-wrapper">
+                        <h3>Third Order (1/C² vs t)</h3>
+                        <canvas id="invSqChart"></canvas>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+    <script src="{{ url_for('static', filename='script.js') }}"></script>
+</body>
+
+</html>
