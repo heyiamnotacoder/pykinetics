@@ -10,10 +10,22 @@
 
 **Pykinetics** is a modern, responsive web application designed for comprehensive pharmacokinetic (PK) analysis. Built with Python (Flask) and a dynamic JavaScript frontend, it allows users to input concentration-time data and instantly receive detailed kinetic modeling, robust parameter calculations, and interactive visualizations.
 
-## Screenshot
+## How It Works
+
+### 1️⃣ Input Your Data
+Enter the administration route, number of compartments, drug dose, and concentration-time data points into the input form.
 
 <div align="center">
-  <img src="result.png" alt="Pykinetics App Screenshot" width="800px">
+  <img src="input_values.png" alt="Pykinetics Data Input" width="400px">
+  <p><em>Input concentration-time data for your drug</em></p>
+</div>
+
+### 2️⃣ Get PK Analysis Results
+Click **Analyze Kinetics** and instantly receive comprehensive pharmacokinetic parameters, kinetic order classification, compartmental model selection, and interactive plots.
+
+<div align="center">
+  <img src="result.png" alt="Pykinetics Analysis Results" width="800px">
+  <p><em>Complete PK analysis with parameters, graphs, and model fitting</em></p>
 </div>
 
 ## Key Features
