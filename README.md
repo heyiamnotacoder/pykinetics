@@ -10,6 +10,12 @@
 
 **Pykinetics** is a modern, responsive web application designed for comprehensive pharmacokinetic (PK) analysis. Built with Python (Flask) and a dynamic JavaScript frontend, it allows users to input concentration-time data and instantly receive detailed kinetic modeling, robust parameter calculations, and interactive visualizations.
 
+## Screenshot
+
+<div align="center">
+  <img src="result.png" alt="Pykinetics App Screenshot" width="800px">
+</div>
+
 ## Key Features
 
 ### 1. Robust Kinetic Modeling
